@@ -46,7 +46,8 @@ public class Camera2Options extends CameraOptions {
             Integer cameraFacing = cameraCharacteristics1.get(LENS_FACING);
             if (cameraFacing != null) {
                 Facing value = mapper.unmapFacing(cameraFacing);
-                if (value != null) supportedFacing.add(value);
+                if (value != null)
+                    supportedFacing.add(value);
             }
         }
 
@@ -55,7 +56,8 @@ public class Camera2Options extends CameraOptions {
         //noinspection ConstantConditions
         for (int awbMode : awbModes) {
             WhiteBalance value = mapper.unmapWhiteBalance(awbMode);
-            if (value != null) supportedWhiteBalance.add(value);
+            if (value != null)
+                supportedWhiteBalance.add(value);
         }
 
         // Flash
@@ -76,15 +78,15 @@ public class Camera2Options extends CameraOptions {
         //noinspection ConstantConditions
         for (int sceneMode : sceneModes) {
             Hdr value = mapper.unmapHdr(sceneMode);
-            if (value != null) supportedHdr.add(value);
+            if (value != null)
+                supportedHdr.add(value);
         }
 
         // Zoom
         Float maxZoom = cameraCharacteristics.get(SCALER_AVAILABLE_MAX_DIGITAL_ZOOM);
-        if(maxZoom != null) {
+        if (maxZoom != null) {
             zoomSupported = maxZoom > 1;
         }
-
 
         // AutoFocus
         // This now means 3A metering with respect to a specific region of the screen.
@@ -107,7 +109,6 @@ public class Camera2Options extends CameraOptions {
         }
         exposureCorrectionSupported = exposureCorrectionMinValue != 0
                 && exposureCorrectionMaxValue != 0;
-
 
         // Picture Sizes
         StreamConfigurationMap streamMap = cameraCharacteristics.get(
@@ -138,7 +139,12 @@ public class Camera2Options extends CameraOptions {
         // As a safety measure, remove Sizes bigger than CamcorderProfile.highest
         CamcorderProfile profile = CamcorderProfiles.get(cameraId,
                 new Size(Integer.MAX_VALUE, Integer.MAX_VALUE));
-        Size videoMaxSize = new Size(profile.videoFrameWidth, profile.videoFrameHeight);
+        Size videoMaxSize;
+        if (profile != null) {
+            videoMaxSize = new Size(profile.videoFrameWidth, profile.videoFrameHeight);
+        } else {
+            videoMaxSize = new Size(Integer.MAX_VALUE, Integer.MAX_VALUE);
+        }
         android.util.Size[] vsizes = streamMap.getOutputSizes(MediaRecorder.class);
         for (android.util.Size size : vsizes) {
             if (size.getWidth() <= videoMaxSize.getWidth()

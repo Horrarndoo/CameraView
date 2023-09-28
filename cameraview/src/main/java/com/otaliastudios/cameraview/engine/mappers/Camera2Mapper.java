@@ -47,6 +47,9 @@ public class Camera2Mapper {
     static {
         FACING.put(Facing.BACK, CameraCharacteristics.LENS_FACING_BACK);
         FACING.put(Facing.FRONT, CameraCharacteristics.LENS_FACING_FRONT);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            FACING.put(Facing.EXTERNAL, CameraCharacteristics.LENS_FACING_EXTERNAL);
+        }
         WB.put(WhiteBalance.AUTO, CameraCharacteristics.CONTROL_AWB_MODE_AUTO);
         WB.put(WhiteBalance.CLOUDY, CameraCharacteristics.CONTROL_AWB_MODE_CLOUDY_DAYLIGHT);
         WB.put(WhiteBalance.DAYLIGHT, CameraCharacteristics.CONTROL_AWB_MODE_DAYLIGHT);
@@ -56,7 +59,8 @@ public class Camera2Mapper {
         HDR.put(Hdr.ON, 18 /* CameraCharacteristics.CONTROL_SCENE_MODE_HDR */);
     }
 
-    private Camera2Mapper() {}
+    private Camera2Mapper() {
+    }
 
     @NonNull
     public List<Pair<Integer, Integer>> mapFlash(@NonNull Flash flash) {
@@ -98,12 +102,15 @@ public class Camera2Mapper {
                 break;
             }
         }
-        return  result;
+        return result;
     }
 
     public int mapFacing(@NonNull Facing facing) {
-        //noinspection ConstantConditions
-        return FACING.get(facing);
+        Integer i = FACING.get(facing);
+        if (i == null) {
+            return CameraCharacteristics.LENS_FACING_BACK;
+        }
+        return i;
     }
 
     public int mapWhiteBalance(@NonNull WhiteBalance whiteBalance) {
@@ -136,7 +143,8 @@ public class Camera2Mapper {
                 break;
             }
             case CameraCharacteristics.CONTROL_AE_MODE_ON_EXTERNAL_FLASH:
-            default: break; // we don't support external flash
+            default:
+                break; // we don't support external flash
         }
         return result;
     }

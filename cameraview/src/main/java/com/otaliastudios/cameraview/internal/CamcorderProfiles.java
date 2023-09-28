@@ -50,7 +50,6 @@ public class CamcorderProfiles {
      * @param targetSize the target video size
      * @return a profile
      */
-    @NonNull
     public static CamcorderProfile get(@NonNull String cameraId, @NonNull Size targetSize) {
         // It seems that the way to do this is to use Integer.parseInt().
         try {
@@ -58,6 +57,9 @@ public class CamcorderProfiles {
             return get(camera1Id, targetSize);
         } catch (NumberFormatException e) {
             LOG.w("NumberFormatException for Camera2 id:", cameraId);
+            return CamcorderProfile.get(CamcorderProfile.QUALITY_LOW);
+        } catch (RuntimeException e){
+            e.printStackTrace();
             return CamcorderProfile.get(CamcorderProfile.QUALITY_LOW);
         }
     }

@@ -55,20 +55,29 @@ class CameraActivity : AppCompatActivity(), View.OnClickListener, OptionView.Cal
                     LOG.v("Frame delayMillis:", delay, "FPS:", 1000 / delay)
                     if (DECODE_BITMAP) {
                         if (frame.format == ImageFormat.NV21
-                                && frame.dataClass == ByteArray::class.java) {
+                            && frame.dataClass == ByteArray::class.java
+                        ) {
                             val data = frame.getData<ByteArray>()
-                            val yuvImage = YuvImage(data,
-                                    frame.format,
-                                    frame.size.width,
-                                    frame.size.height,
-                                    null)
+                            val yuvImage = YuvImage(
+                                data,
+                                frame.format,
+                                frame.size.width,
+                                frame.size.height,
+                                null
+                            )
                             val jpegStream = ByteArrayOutputStream()
-                            yuvImage.compressToJpeg(Rect(0, 0,
+                            yuvImage.compressToJpeg(
+                                Rect(
+                                    0, 0,
                                     frame.size.width,
-                                    frame.size.height), 100, jpegStream)
+                                    frame.size.height
+                                ), 100, jpegStream
+                            )
                             val jpegByteArray = jpegStream.toByteArray()
-                            val bitmap = BitmapFactory.decodeByteArray(jpegByteArray,
-                                    0, jpegByteArray.size)
+                            val bitmap = BitmapFactory.decodeByteArray(
+                                jpegByteArray,
+                                0, jpegByteArray.size
+                            )
                             bitmap.toString()
                         }
                     }
@@ -85,45 +94,45 @@ class CameraActivity : AppCompatActivity(), View.OnClickListener, OptionView.Cal
         val group = controlPanel.getChildAt(0) as ViewGroup
         val watermark = findViewById<View>(R.id.watermark)
         val options: List<Option<*>> = listOf(
-                // Layout
-                Option.Width(), Option.Height(),
-                // Engine and preview
-                Option.Mode(), Option.Engine(), Option.Preview(),
-                // Some controls
-                Option.Flash(), Option.WhiteBalance(), Option.Hdr(),
-                Option.PictureMetering(), Option.PictureSnapshotMetering(),
-                Option.PictureFormat(),
-                // Video recording
-                Option.PreviewFrameRate(), Option.VideoCodec(), Option.Audio(), Option.AudioCodec(),
-                // Gestures
-                Option.Pinch(), Option.HorizontalScroll(), Option.VerticalScroll(),
-                Option.Tap(), Option.LongTap(),
-                // Watermarks
-                Option.OverlayInPreview(watermark),
-                Option.OverlayInPictureSnapshot(watermark),
-                Option.OverlayInVideoSnapshot(watermark),
-                // Frame Processing
-                Option.FrameProcessingFormat(),
-                // Other
-                Option.Grid(), Option.GridColor(), Option.UseDeviceOrientation()
+            // Layout
+            Option.Width(), Option.Height(),
+            // Engine and preview
+            Option.Mode(), Option.Engine(), Option.Preview(),
+            // Some controls
+            Option.Flash(), Option.WhiteBalance(), Option.Hdr(),
+            Option.PictureMetering(), Option.PictureSnapshotMetering(),
+            Option.PictureFormat(),
+            // Video recording
+            Option.PreviewFrameRate(), Option.VideoCodec(), Option.Audio(), Option.AudioCodec(),
+            // Gestures
+            Option.Pinch(), Option.HorizontalScroll(), Option.VerticalScroll(),
+            Option.Tap(), Option.LongTap(),
+            // Watermarks
+            Option.OverlayInPreview(watermark),
+            Option.OverlayInPictureSnapshot(watermark),
+            Option.OverlayInVideoSnapshot(watermark),
+            // Frame Processing
+            Option.FrameProcessingFormat(),
+            // Other
+            Option.Grid(), Option.GridColor(), Option.UseDeviceOrientation()
         )
         val dividers = listOf(
-                // Layout
-                false, true,
-                // Engine and preview
-                false, false, true,
-                // Some controls
-                false, false, false, false, false, true,
-                // Video recording
-                false, false, false, true,
-                // Gestures
-                false, false, false, false, true,
-                // Watermarks
-                false, false, true,
-                // Frame Processing
-                true,
-                // Other
-                false, false, true
+            // Layout
+            false, true,
+            // Engine and preview
+            false, false, true,
+            // Some controls
+            false, false, false, false, false, true,
+            // Video recording
+            false, false, false, true,
+            // Gestures
+            false, false, false, false, true,
+            // Watermarks
+            false, false, true,
+            // Frame Processing
+            true,
+            // Other
+            false, false, true
         )
         for (i in options.indices) {
             val view = OptionView<Any>(this)
@@ -212,7 +221,11 @@ class CameraActivity : AppCompatActivity(), View.OnClickListener, OptionView.Cal
             LOG.w("onVideoRecordingEnd!")
         }
 
-        override fun onExposureCorrectionChanged(newValue: Float, bounds: FloatArray, fingers: Array<PointF>?) {
+        override fun onExposureCorrectionChanged(
+            newValue: Float,
+            bounds: FloatArray,
+            fingers: Array<PointF>?
+        ) {
             super.onExposureCorrectionChanged(newValue, bounds, fingers)
             message("Exposure correction:$newValue", false)
         }
@@ -289,10 +302,16 @@ class CameraActivity : AppCompatActivity(), View.OnClickListener, OptionView.Cal
     }
 
     private fun toggleCamera() {
+        if (camera.facing == Facing.EXTERNAL) {
+            message("current is external camera!", false)
+            return
+        }
+
         if (camera.isTakingPicture || camera.isTakingVideo) return
-        when (camera.toggleFacing()) {
-            Facing.BACK -> message("Switched to back camera!", false)
-            Facing.FRONT -> message("Switched to front camera!", false)
+        if (camera.toggleFacing() == Facing.BACK) {
+            message("Switched to back camera!", false)
+        } else if (camera.toggleFacing() == Facing.FRONT) {
+            message("Switched to front camera!", false)
         }
     }
 
@@ -323,8 +342,10 @@ class CameraActivity : AppCompatActivity(), View.OnClickListener, OptionView.Cal
             val preview = camera.preview
             val wrapContent = value as Int == WRAP_CONTENT
             if (preview == Preview.SURFACE && !wrapContent) {
-                message("The SurfaceView preview does not support width or height changes. " +
-                        "The view will act as WRAP_CONTENT by default.", true)
+                message(
+                    "The SurfaceView preview does not support width or height changes. " +
+                            "The view will act as WRAP_CONTENT by default.", true
+                )
                 return false
             }
         }
@@ -334,7 +355,11 @@ class CameraActivity : AppCompatActivity(), View.OnClickListener, OptionView.Cal
         return true
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String?>, grantResults: IntArray) {
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String?>,
+        grantResults: IntArray
+    ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         val valid = grantResults.all { it == PERMISSION_GRANTED }
         if (valid && !camera.isOpened) {

@@ -24,7 +24,12 @@ public enum Facing implements Control {
     /**
      * Front-facing camera sensor.
      */
-    FRONT(1);
+    FRONT(1),
+
+    /**
+     * External-facing camera sensor.
+     */
+    EXTERNAL(2);
 
     @NonNull
     static Facing DEFAULT(@Nullable Context context) {
@@ -34,6 +39,8 @@ public enum Facing implements Control {
             return BACK;
         } else if (CameraUtils.hasCameraFacing(context, FRONT)) {
             return FRONT;
+        } else if (CameraUtils.hasCameraFacing(context, EXTERNAL)) {
+            return EXTERNAL;
         } else {
             // The controller will throw a CameraException.
             // This device has no cameras.

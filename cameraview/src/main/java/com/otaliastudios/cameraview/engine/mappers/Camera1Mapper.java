@@ -1,6 +1,7 @@
 package com.otaliastudios.cameraview.engine.mappers;
 
 import android.hardware.Camera;
+import android.hardware.camera2.CameraCharacteristics;
 import android.os.Build;
 
 import com.otaliastudios.cameraview.controls.Control;
@@ -42,6 +43,9 @@ public class Camera1Mapper {
         FLASH.put(Flash.TORCH, Camera.Parameters.FLASH_MODE_TORCH);
         FACING.put(Facing.BACK, Camera.CameraInfo.CAMERA_FACING_BACK);
         FACING.put(Facing.FRONT, Camera.CameraInfo.CAMERA_FACING_FRONT);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            FACING.put(Facing.EXTERNAL, CameraCharacteristics.LENS_FACING_EXTERNAL);
+        }
         WB.put(WhiteBalance.AUTO, Camera.Parameters.WHITE_BALANCE_AUTO);
         WB.put(WhiteBalance.INCANDESCENT, Camera.Parameters.WHITE_BALANCE_INCANDESCENT);
         WB.put(WhiteBalance.FLUORESCENT, Camera.Parameters.WHITE_BALANCE_FLUORESCENT);
@@ -55,7 +59,8 @@ public class Camera1Mapper {
         }
     }
 
-    private Camera1Mapper() {}
+    private Camera1Mapper() {
+    }
 
     @NonNull
     public String mapFlash(@NonNull Flash flash) {
@@ -64,8 +69,11 @@ public class Camera1Mapper {
     }
 
     public int mapFacing(@NonNull Facing facing) {
-        //noinspection ConstantConditions
-        return FACING.get(facing);
+        Integer i = FACING.get(facing);
+        if (i == null) {
+            return Camera.CameraInfo.CAMERA_FACING_BACK;
+        }
+        return i;
     }
 
     @NonNull
